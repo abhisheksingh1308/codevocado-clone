@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Codevocado – Assessment Platform</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body>
+<header class="navbar">
+  <div class="nav-brand">
+    <img src="{{ url_for('static', filename='logo.png') }}" alt="Codevocado">
+    <div>
+      <h1>Codevocado</h1>
+      <span>Assessment Platform</span>
+    </div>
+  </div>
+  <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+  <div class="nav-wrapper" id="navMenu">
+    <nav class="nav-menu">
+      <a href="#features" onclick="toggleMenu()">Features</a>
+      <a href="#how" onclick="toggleMenu()">How It Works</a>
+      <a href="#users" onclick="toggleMenu()">Users</a>
+      <a href="#testimonials" onclick="toggleMenu()">Testimonials</a>
+      <a href="#assessment" onclick="toggleMenu()">Assessment</a>
+    </nav>
+    <div class="nav-cta">
+      {% if session.get('user_id') %}
+          <span class="user-welcome">Welcome, {{ session.get('username') }}</span>
+          <a href="{{ url_for('dashboard') }}" class="btn-outline">Dashboard</a>
+          <a href="{{ url_for('logout') }}" class="btn-solid">Logout</a>
+      {% else %}
+          <button class="btn-outline" onclick="openDemoModal()">Book Demo</button>
+          <a href="{{ url_for('login') }}" class="btn-solid">Login</a>
+      {% endif %}
+    </div>
+  </div>
+</header>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="container" style="padding-top: 20px; max-width: 1200px; margin: 0 auto;">
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">{{ message }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+<section class="hero">
+  <img src="{{ url_for('static', filename='logo.png') }}" class="hero-logo">
+  <h2>Secure Online Exams!</h2>
+  <p>Advanced assessment platform for students and educators.</p>
+  
+  <div class="hero-actions">
+    {% if session.get('user_id') %}
+        <button class="btn-solid" onclick="openCreateTestModal()">Create New Test</button>
+        <a href="{{ url_for('dashboard') }}" class="btn-outline">Manage Assessments</a>
+    {% else %}
+        <button class="btn-solid" onclick="openDemoModal()">Book a Demo</button>
+        <a href="{{ url_for('login') }}" class="btn-outline">Login to Portal</a>
+    {% endif %}
+  </div>
+</section>
+
+{% if session.get('user_id') %}
+    <div id="createTestModal" class="modal">
+        <div class="modal-content modal-large">
+            <span class="close" onclick="closeCreateTestModal()">&times;</span>
+            <h2>Create New Assessment</h2>
+            <form action="/add_user" method="POST">
+              <input type="text" name="name" placeholder="Enter Name" required>
+              <input type="email" name="email" placeholder="Enter Email" required>
+              <button type="submit">Submit</button>
+            </form>
+
+            <form id="createTestForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Test Name</label>
+                        <input type="text" name="title" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Duration (minutes)</label>
+                        <input type="number" name="duration" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Total Marks</label>
+                        <input type="number" name="total_marks" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Start Date</label>
+                        <input type="datetime-local" name="start_date">
+                    </div>
+                    <div class="form-group">
+                        <label>End Date</label>
+                        <input type="datetime-local" name="end_date">
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Description</label>
+                    <textarea name="description" rows="3"></textarea>
+                </div>
+
+                <div id="questionsContainer">
+                    <h3>Questions</h3>
+                    <!-- Questions added dynamically -->
+                </div>
+
+                <button type="button" class="btn-outline" onclick="addQuestion()">+ Add Question</button>
+                
+                <div class="form-actions">
+                    <button type="submit" class="btn-solid">Save Assessment</button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endif %}
+
+<section id="features" class="section">
+  <h2>Powerful Exam Features</h2>
+  <div class="cards">
+    <div class="card reveal">
+      <h3>Anti-Cheat Protection</h3>
+      <p>Advanced monitoring with copy-paste detection and tab switching alerts.</p>
+    </div>
+    <div class="card reveal">
+      <h3>Timed Assessments</h3>
+      <p>Customizable time limits with automatic submission and real-time progress.</p>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how" class="section soft-bg">
+  <div class="two-col">
+    <div class="reveal">
+      <h2>How Codevocado Works</h2>
+      <p>
+        Our secure examination platform provides a comprehensive solution for online
+        assessments with advanced proctoring and anti-cheat measures.
+      </p>
+      <p>
+        Students take exams in a monitored environment while administrators get
+        real-time insights and detailed analytics.
+      </p>
+    </div>
+
+    <div class="stats">
+      <div class="stat reveal">1000+<span>EXAMS CONDUCTED</span></div>
+      <div class="stat reveal">5000+<span>STUDENTS ASSESSED</span></div>
+      <div class="stat reveal">99.9%<span>UPTIME</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- USERS -->
+<section id="users" class="section">
+  <h2>Who Can Use Codevocado?</h2>
+  <div class="cards">
+    <div class="card reveal">
+      <h3>Students</h3>
+      <p>
+        Take secure online exams with real-time monitoring and instant feedback on your performance.
+      </p>
+    </div>
+    <div class="card reveal">
+      <h3>Administrators</h3>
+      <p>
+        Create and manage exams, monitor student activity, and analyze results with detailed reports.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS (Refactored) -->
+<section id="testimonials" class="section soft-bg">
+  <div class="section-header">
+    <h2>What Our Users Say</h2>
+    <p>Trusted by educators and students worldwide.</p>
+  </div>
+
+  <div class="testimonial-grid">
+    <!-- Card 1 -->
+    <div class="testimonial-card reveal">
+      <div class="stars">★★★★★</div>
+      <p class="feedback">
+        "Codevocado has completely transformed how we conduct exams. The interface is intuitive and the anti-cheat features are top-notch."
+      </p>
+      <div class="user-info">
+        <div class="avatar">S</div>
+        <div>
+          <h4>Sarah Johnson</h4>
+          <span>Educator, Tech University</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="testimonial-card reveal">
+      <div class="stars">★★★★★</div>
+      <p class="feedback">
+        "As a student, I love the clean design and how easy it is to track my progress. The real-time feedback is super helpful."
+      </p>
+      <div class="user-info">
+        <div class="avatar">M</div>
+        <div>
+          <h4>Mike Chen</h4>
+          <span>Student, CS Major</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="testimonial-card reveal">
+      <div class="stars">★★★★☆</div>
+      <p class="feedback">
+        "Great platform for managing large-scale assessments. The analytics dashboard gives us exactly the insights we need."
+      </p>
+      <div class="user-info">
+        <div class="avatar">A</div>
+        <div>
+          <h4>Alex Rivera</h4>
+          <span>HR Manager, DevCorp</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section id="assessment" class="assessment-hero">
+  <div class="assessment-content">
+    <h2>Create Assessment Tests</h2>
+    <p>Design, customize, and publish secure online assessments with ease.</p>
+    
+    <div class="hero-buttons">
+      {% if session.get('user_id') %}
+        <button class="btn-primary-filled" onclick="openCreateTestModal()">Create New Test</button>
+        <a href="{{ url_for('dashboard') }}" class="btn-secondary-outline">Manage Assessments</a>
+      {% else %}
+        <button class="btn-primary-filled" onclick="openDemoModal()">Create New Test</button>
+        <button class="btn-secondary-outline" onclick="openDemoModal()">Manage Assessments</button>
+      {% endif %}
+    </div>
+
+    <div class="feature-list">
+      <div class="feature-item">
+        <span class="icon">✓</span> Question Bank Management
+      </div>
+      <div class="feature-item">
+        <span class="icon">✓</span> Candidate Access Control
+      </div>
+      <div class="feature-item">
+        <span class="icon">✓</span> Test Scheduling & Publishing
+      </div>
+      <div class="feature-item">
+        <span class="icon">✓</span> Real-time Monitoring
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="modern-footer">
+  <div class="footer-container">
+    <div class="footer-col">
+      <div class="footer-brand">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="Codevocado">
+        <h3>Codevocado</h3>
+      </div>
+      <p>Leading the future of secure online assessments with advanced proctoring technology.</p>
+    </div>
+    
+    <div class="footer-col">
+      <h4>For Students</h4>
+      <ul class="footer-links">
+        <li><a href="#">Practice Tests</a></li>
+        <li><a href="#">Study Materials</a></li>
+        <li><a href="#">Results Dashboard</a></li>
+        <li><a href="#">Exam Schedule</a></li>
+      </ul>
+    </div>
+    
+    <div class="footer-col">
+      <h4>For Educators</h4>
+      <ul class="footer-links">
+        <li><a href="#">Create Exams</a></li>
+        <li><a href="#">Monitor Sessions</a></li>
+        <li><a href="#">Analytics & Reports</a></li>
+        <li><a href="#">Question Bank</a></li>
+      </ul>
+    </div>
+    
+    <div class="footer-col">
+      <h4>Platform / Support</h4>
+      <ul class="footer-links">
+        <li><a href="#">Security Features</a></li>
+        <li><a href="#">API Documentation</a></li>
+        <li><a href="#">Help Center</a></li>
+        <li><a href="#">Contact Support</a></li>
+      </ul>
+    </div>
+  </div>
+  
+  <div class="footer-bottom">
+    <div class="copyright">
+      © 2026 Codevocado. All rights reserved.
+    </div>
+    <div class="legal-links">
+      <a href="#">Privacy Policy</a> | 
+      <a href="#">Terms</a> | 
+      <a href="#">Cookie Policy</a>
+    </div>
+  </div>
+</footer>
+
+<!-- Demo Modal -->
+<div id="demoModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeDemoModal()">&times;</span>
+    <h2>Book a Demo</h2>
+    <p>Fill out the form below and we'll get back to you.</p>
+    <form action="{{ url_for('book_demo') }}" method="POST">
+      <label>Name</label>
+      <input type="text" name="name" required placeholder="Your Name">
+      
+      <label>Email</label>
+      <input type="email" name="email" required placeholder="Your Email">
+      
+      <label>Phone</label>
+      <input type="tel" name="phone" placeholder="Your Phone Number">
+      
+      <label>Message</label>
+      <textarea name="message" placeholder="Any specific requirements?"></textarea>
+      
+      <button type="submit" class="btn-solid" style="width: 100%; margin-top: 10px;">Submit Request</button>
+    </form>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

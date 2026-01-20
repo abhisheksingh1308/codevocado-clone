@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Exam Portal Login</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+<body class="login-body">
+<div class="login-card">
+  <img src="{{ url_for('static', filename='logo.png') }}" class="login-logo">
+  <h2>Exam Portal Login</h2>
+  <p class="login-sub">Sign in to access your assessments</p>
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+  <form action="{{ url_for('login') }}" method="POST">
+    <div class="form-group">
+        <label>Username</label>
+        <input type="text" name="username" placeholder="Enter your username" required>
+    </div>
+    <div class="form-group">
+        <label>Password</label>
+        <input type="password" name="password" placeholder="Enter your password" required>
+        <div style="text-align: right; margin-top: 8px;">
+            <a href="#" onclick="openForgotPasswordModal(); return false;" class="forgot-password-link">Forgot Password?</a>
+        </div>
+    </div>
+    <button type="submit" class="btn-solid login-btn">Sign In</button>
+  </form>
+  <p class="login-footer">
+    🎓 <strong>Welcome!</strong> Sign in to access your dashboard
+  </p>
+</div>
+<div id="forgotPasswordModal" class="modal">
+  <div class="modal-content">
+    <span class="close" onclick="closeForgotPasswordModal()">&times;</span>
+    <h2 style="margin-bottom: 15px; color: #1e293b; font-size: 1.5rem;">Reset Password</h2>
+    <p style="margin-bottom: 20px; color: #64748b;">Enter your email address and we'll send you a link to reset your password.</p>
+    <form onsubmit="event.preventDefault(); closeForgotPasswordModal(); alert('If this email is registered, you will receive a reset link shortly.');">
+        <div style="text-align: left; margin-bottom: 20px;">
+            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #334155;">Email Address</label>
+            <input type="email" placeholder="Enter your email" required style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 1rem;">
+        </div>
+        <div style="text-align: right;">
+            <button type="button" onclick="closeForgotPasswordModal()" style="background: transparent; border: 2px solid #e2e8f0; color: #64748b; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; margin-right: 10px;">Cancel</button>
+            <button type="submit" style="background: #0f766e; color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: 600;">Reset Password</button>
+        </div>
+    </form>
+  </div>
+</div>
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
